@@ -1,0 +1,24 @@
+//
+//  SetFile.pch
+//  DrawTest
+//
+//  Created by 冷求慧 on 2017/8/1.
+//  Copyright © 2017年 冷求慧. All rights reserved.
+//
+
+#ifndef SetFile_pch
+#define SetFile_pch
+
+#define screenWidthW  [[UIScreen mainScreen] bounds].size.width
+#define screenHeightH [[UIScreen mainScreen] bounds].size.height
+
+#define titleRatio         screenWidthW/320.0  // 文字的比例(Iphone6(1.17) Iphone6Plus(1.3))
+#define heightRatioWithAll titleRatio*1.0      // 高度的比例
+
+#define cusFont(font)     [UIFont systemFontOfSize:font]
+#define cusColor(r,g,b,a) [UIColor colorWithRed:r/255.0f green:g/255.0f blue:b/255.0f alpha:a]
+#define sureLowBlueColor  cusColor(155, 177,243,1.0)         // 浅蓝的颜色
+
+
+
+#endif /* SetFile_pch */
