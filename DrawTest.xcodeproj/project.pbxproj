@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		850992CF1F30837D00892E04 /* CircularSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = 850992CE1F30837D00892E04 /* CircularSlider.m */; };
 		85D87A731F30257C00F9880E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 85D87A721F30257C00F9880E /* main.m */; };
 		85D87A761F30257C00F9880E /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 85D87A751F30257C00F9880E /* AppDelegate.m */; };
 		85D87A791F30257C00F9880E /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 85D87A781F30257C00F9880E /* ViewController.m */; };
@@ -21,6 +22,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		850992CD1F30837D00892E04 /* CircularSlider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CircularSlider.h; sourceTree = "<group>"; };
+		850992CE1F30837D00892E04 /* CircularSlider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CircularSlider.m; sourceTree = "<group>"; };
+		857DFF4E1F30AFE8002A318A /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		85D87A6E1F30257C00F9880E /* DrawTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DrawTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		85D87A721F30257C00F9880E /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		85D87A741F30257C00F9880E /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -55,11 +59,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		857DFF4D1F30AFE8002A318A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				857DFF4E1F30AFE8002A318A /* UIKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		85D87A651F30257C00F9880E = {
 			isa = PBXGroup;
 			children = (
 				85D87A701F30257C00F9880E /* DrawTest */,
 				85D87A6F1F30257C00F9880E /* Products */,
+				857DFF4D1F30AFE8002A318A /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -102,6 +115,8 @@
 		85D87A881F30259C00F9880E /* MainView */ = {
 			isa = PBXGroup;
 			children = (
+				850992CD1F30837D00892E04 /* CircularSlider.h */,
+				850992CE1F30837D00892E04 /* CircularSlider.m */,
 				85D87A891F3025B500F9880E /* SleepQualityView.h */,
 				85D87A8A1F3025B500F9880E /* SleepQualityView.m */,
 			);
@@ -215,6 +230,7 @@
 				85D87A961F30268100F9880E /* UIView+Extension.m in Sources */,
 				85D87A951F30268100F9880E /* NSObject+ChangeUnicode.m in Sources */,
 				85D87A791F30257C00F9880E /* ViewController.m in Sources */,
+				850992CF1F30837D00892E04 /* CircularSlider.m in Sources */,
 				85D87A761F30257C00F9880E /* AppDelegate.m in Sources */,
 				85D87A8B1F3025B500F9880E /* SleepQualityView.m in Sources */,
 				85D87A731F30257C00F9880E /* main.m in Sources */,
@@ -337,6 +353,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
 				DEVELOPMENT_TEAM = 4ETV77S77W;
 				GCC_PREFIX_HEADER = DrawTest/SetFile.pch;
 				INFOPLIST_FILE = DrawTest/Info.plist;
@@ -351,6 +368,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = NO;
 				DEVELOPMENT_TEAM = 4ETV77S77W;
 				GCC_PREFIX_HEADER = DrawTest/SetFile.pch;
 				INFOPLIST_FILE = DrawTest/Info.plist;

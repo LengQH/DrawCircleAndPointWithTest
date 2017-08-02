@@ -57,17 +57,10 @@
 #define centerRectangleH                  4*heightRatioWithAll    // 中间矩形的高度
 #define finaLeftAndRightLineH             38*heightRatioWithAll   // 最后左右直线的高度
 
-#define animationNeedTimeWithACircle      2.0                     // 一个周期(一个圆)需要的动画时间
-#define averageNumber                     10.0                    // 弧度的平均个数
-#define lineWValue                        5*heightRatioWithAll    // 线条的宽度值
-#define moveViewWH                        12*heightRatioWithAll
-#define smallMoveImageViewWH              12*heightRatioWithAll
-
-#define changeNum                         40                     // 改变的次数(UILabel)
-
+#define needTimeWithProgress              1.5                     // 需要的动画时间(一个周期的时间)
+#define changeNum                         250                     // 改变的次数(UILabel)
 
 // 对应的动画ID
-#define sleepQualityAnimationID           @"sleepQualityAnimationID"
 #define fiveLineAnimationID               @"fiveLineAnimationID"
 #define verticalLineShapeID               @"verticalLineShapeID"
 #define horizontalLeftAndRightLineID      @"horizontalLeftAndRightLineID"
@@ -83,17 +76,18 @@
     
     CGFloat angValue;                // 平均弧度值
     
-    CGFloat startNeedShowNumValue;
-    CGFloat showNumValue;
-    
-    
-    CGFloat endAngleValueWithSure;   // 停止弧度值(精确到五位)
-    CGFloat endAngleValue;           // 停止弧度值
-    CGFloat averageTime;             // 平均时间
-    CGFloat averageAngle;            // 每次改变的平均弧度
-    
+    CGFloat averageProgress;         // 平均的进度值
+    CGFloat averageNumber;           // 平均的Label值
+    CGFloat addProgress;             // 累加的进度
+    CGFloat addNumber;               // 累加的Label改变的值
     
 }
+/**
+ *  滑块主视图
+ */
+@property (nonatomic,strong)CircularSlider *sliderMainView;
+
+
 /**
  *  添加中心圆上的XY坐标值
  */
@@ -102,19 +96,6 @@
  *  添加最里面圆上的XY坐标值
  */
 @property (nonatomic,strong)NSMutableArray<NSValue *>    *addInsideXYValue;
-
-/**
- *  添加Shape路径数组
- */
-@property (nonatomic,strong)NSMutableArray<CAShapeLayer *> *arrShapeObj;
-/**
- *  添加上一个起点
- */
-@property (nonatomic,strong)NSMutableArray<NSNumber *>  *addDrawCircleLastPoint;
-/**
- *  移动的点视图
- */
-@property (nonatomic,strong)UIView       *movePointView;
 /**
  *  定时器
  */
@@ -136,7 +117,6 @@
  */
 @property (nonatomic,strong)NSMutableArray<CAShapeLayer *>  *addBomLineAnimationShape;
 
-
 @end
 
 
@@ -154,36 +134,24 @@
     }
     return _addInsideXYValue;
 }
--(NSMutableArray<CAShapeLayer *> *)arrShapeObj{
-    if (_arrShapeObj==nil) {
-        _arrShapeObj=[NSMutableArray array];
-    }
-    return _arrShapeObj;
-}
--(NSMutableArray<NSNumber *> *)addDrawCircleLastPoint{
-    if (_addDrawCircleLastPoint==nil) {
-        _addDrawCircleLastPoint=[NSMutableArray array];
-    }
-    return _addDrawCircleLastPoint;
-}
--(UIView *)movePointView{
-    if (_movePointView==nil) {
-        _movePointView=[[UIView alloc]initWithFrame:CGRectMake(0, 0, moveViewWH, moveViewWH)];
-        [self addSubview:_movePointView];
+-(CircularSlider *)sliderMainView{
+    if (_sliderMainView==nil) {
         
-        UIImageView *bigMoveImageView=[[UIImageView alloc]initWithFrame:_movePointView.bounds];
-        bigMoveImageView.layer.masksToBounds=YES;
-        bigMoveImageView.layer.cornerRadius=moveViewWH/2;
-        bigMoveImageView.image=[UIImage imageNamed:@"movePointWithIndexDeep"];
-        [_movePointView addSubview:bigMoveImageView];
+        _sliderMainView=[[CircularSlider alloc]init];
+        _sliderMainView.size=CGSizeMake(centerCircleViewWH+8*heightRatioWithAll, centerCircleViewWH+8*heightRatioWithAll);
+        _sliderMainView.center=outsideCircleView.center;
+        _sliderMainView.backgroundColor=[UIColor clearColor];
+        _sliderMainView.userInteractionEnabled=NO; //  设置不能触摸
+        _sliderMainView.minimumTrackTintColor=cusColor(62, 113, 219, 1.0);
+        _sliderMainView.maximumTrackTintColor=[UIColor clearColor];
+        _sliderMainView.thumbTintColor=cusColor(62, 113, 219, 1.0);
+        _sliderMainView.value=0.0;
+        _sliderMainView.circleWidth=5.0*heightRatioWithAll;
+        _sliderMainView.thumbWidth=6.0*heightRatioWithAll;
         
-        UIImageView *smallMoveImageView=[[UIImageView alloc]initWithFrame:CGRectMake(moveViewWH/2-smallMoveImageViewWH/2, moveViewWH/2-smallMoveImageViewWH/2, smallMoveImageViewWH, smallMoveImageViewWH)];
-        smallMoveImageView.layer.masksToBounds=YES;
-        smallMoveImageView.layer.cornerRadius=smallMoveImageViewWH/2;
-        [smallMoveImageView setBackgroundColor:cusColor(62, 113, 219, 1.0)];
-        [_movePointView addSubview:smallMoveImageView];
+        return _sliderMainView;
     }
-    return _movePointView;
+    return _sliderMainView;
 }
 -(NSMutableArray<UIView *> *)addFiveUIShowView{
     if (_addFiveUIShowView==nil) {
@@ -238,8 +206,9 @@
 -(void)createView{
     
     self.width=self.width*heightRatioWithAll;
+    self.height=self.height*heightRatioWithAll;
     self.backgroundColor=cusColor(112, 112, 112, 0.3);
-
+    
     // 最外面圆视图
     outsideCircleView=[[UIView alloc]initWithFrame:CGRectMake(self.width/2-outsideCircleViewWH/2,outsideCircleViewTopDistance, outsideCircleViewWH, outsideCircleViewWH)];
     [self addSubview:outsideCircleView];
@@ -268,6 +237,9 @@
     insideCircleView.userInteractionEnabled=YES;
     UITapGestureRecognizer *tapGesture=[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(clickSleepQuality)];
     [insideCircleView addGestureRecognizer:tapGesture];
+    
+    // 添加进度条视图
+    [self addSubview:self.sliderMainView];
     
     
     // 睡眠质量数字Label
@@ -630,13 +602,9 @@
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         
-        [self animationShowButtonAndLabel:0];
+        [self animationChangeProgressAndChangeNumber:self.gradeValue];
         
-        [self startExecuteSleepQualityAnimation:self.gradeValue];      // 开始执行睡眠质量动画
-        
-        CGFloat value=self.gradeValue/100.0;
-        CGFloat needFinishTime=animationNeedTimeWithACircle*value;
-        [self changeLabelNum:self.gradeValue needTime:needFinishTime]; // 改变Label上面的值
+        [self animationShowButtonAndLabel:0.0];
         
     });
 }
@@ -656,105 +624,68 @@
  ************************************  添加动画     ************************************/
 
 
-#pragma mark -改变Label上面的值
--(void)changeLabelNum:(CGFloat)numValue needTime:(CGFloat)needTime{
-    startNeedShowNumValue=numValue/changeNum;
-    showNumValue=startNeedShowNumValue;
+#pragma mark  动画改变进度和数字(其实就是不断改变其值)
+-(void)animationChangeProgressAndChangeNumber:(CGFloat)sleepValue{
     
-    CGFloat eachNeedTime=needTime/changeNum;      // 平均每次需要的时间
+    for (UIView *circle in self.addFiveUIShowView) {     // label和按钮设置的透明度设置为0
+        circle.alpha=0.0;
+        circle.hidden=NO;
+    }
+    self.sliderMainView.value=0.0;
+    self.qualityNumberLabel.text=@"0";
     
-//    NSLogLeng(@"显示的最终的数据:%f 完成的总时间:%f 平均的数据:%f 平均的时间:%f",numValue,needTime,startNeedShowNumValue,eachNeedTime);
+    CGFloat ratioValue=sleepValue/100;                       // 比例值
+    CGFloat needPropoTime=needTimeWithProgress*ratioValue;   // 比例时间
     
-    self.qualityNumberLabel.text=[NSString stringWithFormat:@"%0.0f",startNeedShowNumValue];
+    CGFloat averageNeedTime=needPropoTime/changeNum;         // 平均的时间
+    averageProgress=ratioValue/changeNum;                    // 平均进度
+    averageNumber=sleepValue/changeNum;                      // 平均的Label改变的值
+    addProgress=averageProgress;
+    addNumber=averageNumber;
     
-    self.timerWithCalculateNum=[NSTimer scheduledTimerWithTimeInterval:eachNeedTime target:self selector:@selector(changeLabelWithTimer:) userInfo:nil repeats:YES];
-    [[NSRunLoop currentRunLoop]addTimer:self.timerWithCalculateNum forMode:NSRunLoopCommonModes];
+    self.timerWithCalculateNum=[NSTimer scheduledTimerWithTimeInterval:averageNeedTime target:self selector:@selector(changeProgressAndLabelWithTimer:) userInfo:nil repeats:YES];
+    
+    
 }
--(void)changeLabelWithTimer:(NSTimer *)timer{
-    showNumValue=(showNumValue+startNeedShowNumValue);
-    NSInteger maxValue=self.gradeValue;
-    if (showNumValue>=maxValue) {
+#pragma mark 定时器计数(改变Label的数字和进度条的进度)
+-(void)changeProgressAndLabelWithTimer:(NSTimer *)timer{
+    
+    CGFloat maxValue=(self.gradeValue/100.0);
+    if (addProgress>maxValue) {
+        self.sliderMainView.value=maxValue;
+        self.qualityNumberLabel.text=[NSString stringWithFormat:@"%0.0f",(CGFloat)self.gradeValue];
         [timer invalidate];
         timer=nil;
-        showNumValue=0.0;
-        self.qualityNumberLabel.text=[NSString stringWithFormat:@"%zi",maxValue];
-    }
-    else{
-        self.qualityNumberLabel.text=[NSString stringWithFormat:@"%0.0f",showNumValue];
-    }
-}
-
-
-#pragma mark  开始执行睡眠报告动画
--(void)startExecuteSleepQualityAnimation:(CGFloat)gradeValue{
-    
-    self.movePointView.hidden=NO;
-    
-    CGFloat value=gradeValue/100.0;
-    CGFloat needFinishTime=animationNeedTimeWithACircle*value;
-    [self drawSectorView:value needTime:needFinishTime];     // 绘制扇形视图(通过比例)
-    
-}
-#pragma mark 通过睡眠质量绘制扇形(后期的方法分割成10等份执行)
--(void)drawSectorView:(CGFloat)scaleValue needTime:(CGFloat)needTime{
-    
-    for (CAShapeLayer *shapeObj in self.arrShapeObj) { // 移除所有的绘图路径
-        [shapeObj removeFromSuperlayer];
-    }
-    if(!(scaleValue>0)) return;
-    
-    averageTime=needTime/averageNumber;               //  动画每次执行的时间
-    CGFloat unitValue=M_PI*2;                         //  一个圆
-    CGFloat startValue=-(M_PI/2);                     //  起点位置
-    CGFloat finaChangeValue=unitValue*scaleValue;     //  真正需要改变的值
-    endAngleValue=finaChangeValue+startValue;         //  结束的弧度值
-    averageAngle=finaChangeValue/averageNumber;       //  改变的每段弧度值
-    
-    endAngleValueWithSure=[[NSString stringWithFormat:@"%0.5f",endAngleValue] floatValue];
-    
-    CGFloat startFirstValue=startValue+averageAngle;        //  第一个开始的弧度制
-    [self drawCircle:startValue endValue:startFirstValue];  //  开始画圆弧
-}
-#pragma mark 开始画圆弧(判断是否结束绘制动画)
--(void)drawCircle:(CGFloat)startValue endValue:(CGFloat)endValue{
-
-    CGFloat startValueWithSure=[[NSString stringWithFormat:@"%0.5f",startValue] floatValue];
-    if(startValueWithSure>=(endAngleValueWithSure)){
-        [self.timerWithCalculateNum invalidate];
-        self.timerWithCalculateNum=nil;
-        showNumValue=0.0;
-        self.qualityNumberLabel.text=[NSString stringWithFormat:@"%zi",self.gradeValue];
-        
-        [self startExecuteFiveLineAnimation];                          //  执行五个线段动画
-        
         return;
     }
+    self.sliderMainView.value=addProgress;   // 改变进度条的值
+    self.qualityNumberLabel.text=[NSString stringWithFormat:@"%0.0f",addNumber];
+    addProgress+=averageProgress;
+    addNumber+=averageNumber;
+}
+#pragma mark 动画显示按钮和Label
+-(void)animationShowButtonAndLabel:(CGFloat)aValue{
     
-    [self.addDrawCircleLastPoint removeAllObjects];
-    [self.addDrawCircleLastPoint addObject:[NSNumber numberWithFloat:endValue]];  // 添加下一个起点
+    if (aValue>1.0){
+        [self startExecuteFiveLineAnimation];
+        return;
+    }
+    __block CGFloat backFloat=aValue;
     
-    // 添加一个圆的路径
-    UIBezierPath *bezier=[UIBezierPath bezierPath];
-    CGPoint centerPoint=outsideCircleView.center;                               // 圆心的位置
-    CGFloat radiusValue=centerCircleViewWH/2-centerCircleBorderWidth/2;         // 半径
-    
-    [bezier addArcWithCenter:centerPoint radius:radiusValue startAngle:startValue endAngle:endValue clockwise:YES]; // clockwise:是否顺时针
-    
-    // 设置Layer的一些属性
-    CAShapeLayer *shapeLayer=[CAShapeLayer layer];
-    [self.arrShapeObj addObject:shapeLayer];
-    shapeLayer.lineCap=kCALineCapRound;
-    shapeLayer.lineJoin=kCALineJoinRound;
-    shapeLayer.lineWidth=lineWValue;
-    shapeLayer.strokeColor=cusColor(62, 113, 219, 1.0).CGColor;    // 设置空心和实心对应的颜色
-    shapeLayer.fillColor=[UIColor clearColor].CGColor;
-    shapeLayer.path=bezier.CGPath;
-    
-    // 通过关键帧动画和基本动画执行圆弧的整个动画
-    [self addNewKeyframeAnimation:shapeLayer];
-    [self setViewAnimationToLayer:self shapeObj:shapeLayer valueID:sleepQualityAnimationID animationNeedTime:averageTime];
-    
-    
+    if (aValue==0) {
+        for (UIView *circle in self.addFiveUIShowView) {
+            circle.alpha=0.0;
+            circle.hidden=NO;
+        }
+    }
+    [UIView animateWithDuration:0.1 animations:^{
+        for (UIView *circle in self.addFiveUIShowView) {
+            circle.alpha=backFloat;
+        }
+    } completion:^(BOOL finished) {
+        backFloat+=0.1;
+        [self animationShowButtonAndLabel:backFloat];
+    }];
 }
 #pragma mark 执行五个线段动画
 -(void)startExecuteFiveLineAnimation{
@@ -774,18 +705,6 @@
     CABasicAnimation *baseAnimation=[self addNewBaseAnimation:valueID animationNeedTime:animationNeedTime];
     [shapeObj addAnimation:baseAnimation forKey:nil];          // layer添加动画
     [setViewObj.layer addSublayer:shapeObj];
-    
-}
-#pragma mark 添加关键帧动画
--(void)addNewKeyframeAnimation:(CAShapeLayer *)shapeObj{
-    
-    CAKeyframeAnimation *keyFrame=[CAKeyframeAnimation animationWithKeyPath:@"position"];
-    keyFrame.duration=averageTime;
-    keyFrame.path=shapeObj.path;
-    keyFrame.timingFunction=[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
-    keyFrame.removedOnCompletion=NO;
-    keyFrame.fillMode=kCAFillModeForwards;
-    [self.movePointView.layer addAnimation:keyFrame forKey:nil];
     
 }
 #pragma mark 添加基础动画
@@ -808,11 +727,7 @@
 #pragma mark 动画执行完毕
 - (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag{
     
-    // 继续绘制圆弧
-    if ([[anim valueForKey:sleepQualityAnimationID]isEqualToString:sleepQualityAnimationID]) {
-        CGFloat startAngle=[[self.addDrawCircleLastPoint firstObject] floatValue];
-        [self drawCircle:startAngle endValue:startAngle+averageAngle];
-    }
+    
     // 五个线段动画执行完毕之后,显示对应的圆和去动画执行最长的竖直线动画
     if ([[anim valueForKey:fiveLineAnimationID]isEqualToString:fiveLineAnimationID]) {
         [self hiddenOrShowFiveMarginCircle:NO];
@@ -852,32 +767,9 @@
 
 #pragma mark 隐藏或者显示对应的按钮和Label
 -(void)hiddenOrShowLabelAndButton{
-    
     for (UIView *circle in self.addFiveUIShowView) {
         circle.hidden=YES;
     }
-}
-#pragma mark 动画显示按钮和Label
--(void)animationShowButtonAndLabel:(CGFloat)aValue{
-    
-    if (aValue>1.0) return;
-    
-    __block CGFloat backFloat=aValue;
-    
-    if (aValue==0) {
-        for (UIView *circle in self.addFiveUIShowView) {
-            circle.alpha=0.0;
-            circle.hidden=NO;
-        }
-    }
-    [UIView animateWithDuration:0.15 animations:^{
-        for (UIView *circle in self.addFiveUIShowView) {
-            circle.alpha=backFloat;
-        }
-    } completion:^(BOOL finished) {
-        backFloat+=0.1;
-        [self animationShowButtonAndLabel:backFloat];
-    }];
 }
 #pragma mark 隐藏或者显示五个边缘圆
 -(void)hiddenOrShowFiveMarginCircle:(BOOL)isHidden{
@@ -888,15 +780,10 @@
 #pragma mark 移除shape和视图
 -(void)removeShapeAndView{
     
-    self.movePointView.hidden=YES;
-    
     for (CAShapeLayer *shape in self.addFiveAnimationLineShape) {
         [shape removeFromSuperlayer];
     }
     for (CAShapeLayer *shape in self.addBomLineAnimationShape) {
-        [shape removeFromSuperlayer];
-    }
-    for (CAShapeLayer *shape in self.arrShapeObj){
         [shape removeFromSuperlayer];
     }
 }

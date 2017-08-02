@@ -7,9 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
+
 #import "ChangeFontWithLabel.h"
 #import "ChangeFontWithButton.h"
 #import "UIView+Extension.h"
+
+#import "CircularSlider.h"
 
 typedef void (^changeFinished)(void);
 
@@ -29,7 +32,6 @@ typedef void (^changeFinished)(void);
 @end
 
 @interface SleepQualityView : UIView
-
 
 /**
  *  成绩值
@@ -68,7 +70,6 @@ typedef void (^changeFinished)(void);
  */
 
 -(void)setSleepLabelAttributedString:(ChangeFontWithLabel *)setLabel stringValue:(NSString *)string;
-
 /**
  *  开始执行动画
  */
