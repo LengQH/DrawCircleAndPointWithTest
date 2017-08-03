@@ -644,7 +644,7 @@
     addNumber=averageNumber;
     
     self.timerWithCalculateNum=[NSTimer scheduledTimerWithTimeInterval:averageNeedTime target:self selector:@selector(changeProgressAndLabelWithTimer:) userInfo:nil repeats:YES];
-    
+    [[NSRunLoop currentRunLoop]addTimer:self.timerWithCalculateNum forMode:NSRunLoopCommonModes];
     
 }
 #pragma mark 定时器计数(改变Label的数字和进度条的进度)
