@@ -181,6 +181,7 @@
 -(void)awakeFromNib{
     
     [super awakeFromNib];
+    
     [self initWithDrawView];         // 初始化绘图
     
 }
@@ -199,14 +200,13 @@
     
     [self createView];                 // 创建固定的视图
     
-    [self calculatePointAndDrawUI];   // 计算点和绘制视图
+    [self calculatePointAndDrawUI];    // 计算点和绘制视图
     
 }
 #pragma mark 创建视图
 -(void)createView{
     
-    self.width=self.width*heightRatioWithAll;
-    self.height=self.height*heightRatioWithAll;
+
     self.backgroundColor=cusColor(112, 112, 112, 0.3);
     
     // 最外面圆视图
